@@ -8,32 +8,37 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up JDK
+    - name: Set up JDK 17
+    # Java 17 là chuẩn cho AGP 8.x
       uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: '17'
         cache: gradle
 
-    - name: Make gradlew executable
-      run: chmod +x gradlew || true
-
-    - name: Ensure Gradle Wrapper
+    - name: Ensure Gradle wrapper
       run: |
-        if [ ! -f gradlew ]; then
-          gradle wrapper --gradle-version 8.7
-          chmod +x gradlew
-        fi
+        chmod +x gradlew || true
+        [ -f gradlew ] || (gradle wrapper --gradle-version 8.7 && chmod +x gradlew)
 
-    - name: Accept SDK licenses & install packages
-      uses: android-actions/setup-android@v3
-      with:
-        packages: |
-          platforms;android-34
-          build-tools;34.0.0
+    - name: Accept SDK licenses
+      run: |
+        sudo mkdir -p "$ANDROID_SDK_ROOT"
+        sudo chown -R $USER:$USER "$ANDROID_SDK_ROOT"
+        yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+    - name: Install SDK packages (34) with fallback (33)
+      run: |
+        set -e
+        "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+          "platform-tools" "platforms;android-34" "build-tools;34.0.0" \
+        || "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+          "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
     - name: Build Debug APK
       run: ./gradlew :app:assembleDebug --stacktrace
