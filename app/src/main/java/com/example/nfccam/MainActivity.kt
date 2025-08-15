@@ -1,3 +1,4 @@
+import okhttp3.logging.HttpLoggingInterceptor
 package com.example.nfccam
 
 import android.Manifest
