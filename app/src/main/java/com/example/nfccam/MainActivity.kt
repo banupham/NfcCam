@@ -1,5 +1,5 @@
-import okhttp3.logging.HttpLoggingInterceptor
 package com.example.nfccam
+import okhttp3.logging.HttpLoggingInterceptor
 
 import android.Manifest
 import android.annotation.SuppressLint
