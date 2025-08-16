@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { _ ->
         val ok = hasAllPerms()
-        if (ok) initAfterPermission() else Toast.makeText(this, "Thiếu quyền", Toast.LENGTH_SHORT).show()
+        if (ok) initAfterPermission() else Toast.makeText(this, "Thiếu quyền truy cập", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
